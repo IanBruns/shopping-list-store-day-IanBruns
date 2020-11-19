@@ -12,7 +12,7 @@ const generateItemElement = function (item) {
   let itemTitle = `<span class='shopping-item shopping-item__checked'>${item.name}</span>`;
   if (!item.checked) {
     itemTitle = `
-     <span class='shopping-item'>${item.name}</span>
+     <div class="changingValues"><span class='shopping-item'>${item.name}</span></div>
     `;
   }
 
@@ -26,14 +26,28 @@ const generateItemElement = function (item) {
         <button class='shopping-item-delete js-item-delete'>
           <span class='button-label'>delete</span>
         </button>
+        <button class='shopping-item-edit js-item-edit'>
+          <span class='button-label'>edit</span>
+        </button>
       </div>
     </li>`;
 };
+
+const generateEditItemName = function (name) {
+  return `<form id="js-shopping-list-edit">
+      <input type="text" name="shopping-list-entry" class="js-shopping-list-entry" value="${name}">
+      <button type="submit">Add item</button>
+    </form>`
+}
 
 const generateShoppingItemsString = function (shoppingList) {
   const items = shoppingList.map((item) => generateItemElement(item));
   return items.join('');
 };
+
+const generateSpan = function (name) {
+  return `<span class='shopping-item'>${name}</span>`
+}
 
 /**
  * Render the shopping list in the DOM
@@ -94,6 +108,31 @@ const getItemIdFromElement = function (item) {
     .closest('.js-item-element')
     .data('item-id');
 };
+
+const handleEditClicked = function () {
+  $('.js-shopping-list').on('click', '.js-item-edit', event => {
+    let name = $(event.currentTarget).closest('li').find('.shopping-item').text();
+    let html = generateEditItemName(name);
+
+    $(event.currentTarget).closest('li').find('.changingValues').html(html);
+  });
+}
+
+const handleSubmitEdits = function () {
+  $('.shopping-list').on('submit', function (e) {
+    e.preventDefault();
+
+    let newName = e.target['shopping-list-entry'].value;
+    let targetId = $(e.target).closest('li').data('item-id');
+
+    let item = store.items.find(function (item) {
+      return item.id === targetId;
+    })
+
+    item.name = newName;
+    render();
+  })
+}
 
 /**
  * Responsible for deleting a list item.
@@ -160,6 +199,8 @@ const handleShoppingList = function () {
   handleItemCheckClicked();
   handleDeleteItemClicked();
   handleToggleFilterClick();
+  handleEditClicked();
+  handleSubmitEdits();
 };
 
 // when the page loads, call `handleShoppingList`

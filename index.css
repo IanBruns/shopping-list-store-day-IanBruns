@@ -40,6 +40,10 @@ button:hover {
   padding: 20px;
 }
 
+.shopping-item-controls{
+  margin-bottom: 5px;
+}
+
 .shopping-item {
   display: block;
   color: grey;
